@@ -9,7 +9,7 @@
       <p class="title">File Extension</p>
       <select name="file_type">
         <% @valid_file_types.keys.each do |type| %>
-        <option value="<%= type.to_s %>">.<%= type.to_s %></option>
+          <option value="<%= type.to_s %>">.<%= type.to_s %></option>
         <% end %>
       </select>
       <div class="submit new-doc-actions">
