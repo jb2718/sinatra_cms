@@ -114,7 +114,7 @@ post "/users/signout" do
   redirect "/"
 end
 
-get "/?" do
+get "/" do
   erb :index
 end
 
