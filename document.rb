@@ -10,6 +10,18 @@ class Document
     txt: "text",
     md: "markdown"
   }
+
+  def self.create_document(name, file_path)
+    doc = Document.new
+    doc.create_document(name, file_path)
+    doc
+  end
+
+  def self.load(name, file_path)
+    doc = Document.new
+    doc.load(name, file_path)
+    doc
+  end
   
   def load(name, file_path)
     @name = name

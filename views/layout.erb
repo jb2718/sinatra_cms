@@ -15,7 +15,7 @@
             Acme CMS
           </h1>
 
-          <% if session[:logged_in] %>
+          <% if session[:username] %>
             <div class="nav grid_3 push_9">
               <ul>
                 <li><a href="/file/new">New Document</a></li>
@@ -43,7 +43,7 @@
       </div>
     </section>
     <footer class="clearfix">
-      <% if session[:logged_in]==true %>
+      <% if session[:username] %>
         <p>Signed in as <%= "#{session[:username].capitalize}" %></p>
         <form action="/users/signout" method="post">
           <input value="Sign Out" id="submit" type="submit">

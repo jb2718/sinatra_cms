@@ -34,7 +34,7 @@ class CMSTest < Minitest::Test
   end
 
   def user_signed_in
-    {"rack.session" => { username: "admin", logged_in: true}}
+    {"rack.session" => { username: "admin"}}
   end
 
   def test_index
@@ -169,7 +169,6 @@ class CMSTest < Minitest::Test
   def test_login
     post '/users/signin', {username: "admin", password: "test"}
     assert_equal "Welcome!", session[:success]
-    assert_equal true, session[:logged_in]
     assert_equal "admin", session[:username]
     assert_equal 302, last_response.status
 
@@ -184,7 +183,6 @@ class CMSTest < Minitest::Test
 
   def test_logout
     post 'users/signout'
-    assert_equal false, session[:logged_in]
     assert_equal nil, session[:username]
     assert_equal "You have been signed out", session[:success]
   end

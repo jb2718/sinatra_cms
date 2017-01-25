@@ -16,6 +16,15 @@ before do
   end
 end
 
+['/:filename/edit', '/:filename/delete', '/file/new'].each do |route|
+  before route do
+    if !signed_in?
+      session[:error] = "You must be signed in to do that"
+      redirect "/"
+    end
+  end
+end
+
 def load_accounts
   if ENV["RACK_ENV"] == "test"
     path = File.expand_path("../test/test_user_accounts.yml",__FILE__)
@@ -41,8 +50,8 @@ def load_file_data
   Dir[file_pattern].each do |string|
     file_name = File.basename(string)
     path = File.dirname(string)
-    documents << Document.new
-    documents.last.load(file_name, path)
+    doc = Document.load(file_name, path)
+    documents << doc
   end
   documents
 end
@@ -68,22 +77,20 @@ def error_for_new_doc_name(filename, extension)
 end
 
 def signed_in?
-  session[:logged_in]
+  session[:username]
 end
 
-def require_sign_in
-  if !signed_in?
-    session[:error] = "You must be signed in to do that"
-    redirect "/"
-  end
-end
 
 def valid_login?(username, password)
   return ACCOUNTS.has_key?(username) && BCrypt::Password.new(ACCOUNTS[username]) == password
 end
 
 get "/users/signin" do
-  erb :sign_in
+  if signed_in?
+    redirect "/"
+  else
+    erb :sign_in
+  end
 end
 
 post "/users/signin" do
@@ -91,7 +98,6 @@ post "/users/signin" do
   password = params[:password]
   if valid_login?(@username,password)
     session[:username] = @username
-    session[:logged_in] = true
     session[:success] = "Welcome!"
     redirect "/"
   else
@@ -104,7 +110,6 @@ end
 #log user out
 post "/users/signout" do
   session[:username] = nil
-  session[:logged_in] = false
   session[:success] = "You have been signed out"
   redirect "/"
 end
@@ -127,14 +132,12 @@ end
 
 #Render the edit file page
 get "/:filename/edit" do
-  require_sign_in
   @document = find_by_name(params[:filename])
   erb :edit_document
 end
 
 # # Update/edit page information
 post "/:filename/edit" do
-  require_sign_in
   @document = find_by_name(params[:filename])
   @document.update_content(params[:file_content])
   session[:success] = "#{params[:filename]} has been updated."
@@ -143,14 +146,12 @@ end
 
 #Render the new file page
 get "/file/new" do
-  require_sign_in
   @valid_file_types = Document::VALID_FILE_TYPES
   erb :new_document
 end
 
 #Create new file page
 post "/file/new" do
-  require_sign_in
   @valid_file_types = Document::VALID_FILE_TYPES
   @file_name_base = params[:doc_name].strip
   extension = params[:file_type]
@@ -164,8 +165,7 @@ post "/file/new" do
     erb :new_document
   else
     file_name = @file_name_base.strip + "." + extension   
-    @documents << Document.new
-    @documents.last.create_document(file_name, data_path)
+    @documents << Document.create_document(file_name, data_path)
     session[:success] = "#{file_name} has been created."
     redirect "/"
   end
@@ -173,7 +173,6 @@ end
 
 #Delete a file
 post "/:filename/delete" do
-  require_sign_in
   filename = params[:filename]
   doc = find_by_name(filename)
 
