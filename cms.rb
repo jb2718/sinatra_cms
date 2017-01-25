@@ -83,7 +83,7 @@ def valid_login?(username, password)
 end
 
 get "/users/signin" do
-  erb :sign_in, layout: :layout
+  erb :sign_in
 end
 
 post "/users/signin" do
@@ -97,7 +97,7 @@ post "/users/signin" do
   else
     session[:error] = "Invalid Credentials"
     @username = params[:username]
-    erb :sign_in, layout: :layout
+    erb :sign_in
   end
 end
 
@@ -110,7 +110,7 @@ post "/users/signout" do
 end
 
 get "/?" do
-  erb :index, layout: :layout
+  erb :index
 end
 
 #View file content
@@ -145,7 +145,7 @@ end
 get "/file/new" do
   require_sign_in
   @valid_file_types = Document::VALID_FILE_TYPES
-  erb :new_document, layout: :layout
+  erb :new_document
 end
 
 #Create new file page
@@ -161,7 +161,7 @@ post "/file/new" do
     session[:error] = error
     status 422
     @file_name_base
-    erb :new_document, layout: :layout
+    erb :new_document
   else
     file_name = @file_name_base.strip + "." + extension   
     @documents << Document.new
