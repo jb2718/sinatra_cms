@@ -4,11 +4,12 @@ This is a basic file-based content management system.  All users share the same 
 
 ##Instructions
 
-* Enter `$ ruby cms.rb` from the root folder
+* Enter `$ ruby cms.rb` from the root folder to start the application
 
-* Once the application starts, you will be taken to the index page.  In order to carry out functions such as editing content or deleting files, you must be logged in.
+* Once the application starts, go to the index page ('/').  Here you will see a list of all the current documents managed by the system.  In order to carry out functions such as editing content or deleting files, you must be logged in.  At the bottom of the page, there is a 'Sign In' button.  Click that button to go to the login page.
 
-* You can use the following credentials to log in:  username: 'piglet' and password: 'robin'
+* You can use the following credentials to log in:  username: piglet 
+password: robin
 
 
 
