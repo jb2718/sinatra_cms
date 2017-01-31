@@ -77,7 +77,7 @@ class Document
       markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML)
       formatted_data[:headers] = {content_type: "text/html"}
       formatted_data[:body] = markdown.render(@raw_content)
-    else
+    elsif extension == "txt"
       formatted_data[:headers] = {content_type: "text/plain"}
       formatted_data[:body] = @raw_content
     end
