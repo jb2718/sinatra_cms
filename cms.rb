@@ -63,19 +63,6 @@ def find_by_name(filename)
   same_names.first
 end
 
-#Return error if doc name has error, otherwise return nil
-def error_for_new_doc_name(filename, extension)
-  full_file_name = filename + "." + extension
-  if !(1..20).cover?(filename.size)
-    return "File name must be between 1 and 20 characters"
-  elsif find_by_name(full_file_name)
-    return "File name must be unique"
-  elsif (filename =~ /(^[A-Za-z][A-Za-z0-9_]+)$/).nil?
-    return "Invalid file name.  File must begin with an alpha character.  The rest of the file name can only contain alphanumeric characters and underscores"
-  end
-  nil
-end
-
 def signed_in?
   session[:username]
 end
@@ -155,18 +142,24 @@ post "/file/new" do
   @valid_file_types = Document::VALID_FILE_TYPES
   @file_name_base = params[:doc_name].strip
   extension = params[:file_type]
+  full_file_name = @file_name_base.strip + "." + extension
+  error = nil
 
-  error = error_for_new_doc_name(@file_name_base, extension)
+  doc = Document.create_document(full_file_name, data_path)
+  if find_by_name(full_file_name)
+    error = "File name must be unique"  
+  elsif doc.error
+    error = doc.error  
+  end
   
   if error
     session[:error] = error
     status 422
     @file_name_base
     erb :new_document
-  else
-    file_name = @file_name_base.strip + "." + extension   
-    @documents << Document.create_document(file_name, data_path)
-    session[:success] = "#{file_name} has been created."
+  else   
+    @documents << doc
+    session[:success] = "#{full_file_name} has been created."
     redirect "/"
   end
 end

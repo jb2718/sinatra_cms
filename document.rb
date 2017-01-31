@@ -2,7 +2,7 @@ require "redcarpet"
 require "fileutils"
 
 class Document
-  attr_reader :name, :file_path, :raw_content, :file_type, :size
+  attr_reader :name, :file_path, :raw_content, :file_type, :size, :error
 
   VALID_FILE_TYPES = {
     #keys: file types app can process; 
@@ -13,7 +13,10 @@ class Document
 
   def self.create_document(name, file_path)
     doc = Document.new
-    doc.create_document(name, file_path)
+    doc.valid_name_error(name.split('.').first)
+    if doc.error.nil?
+      doc.create_document(name, file_path)
+    end
     doc
   end
 
@@ -21,6 +24,15 @@ class Document
     doc = Document.new
     doc.load(name, file_path)
     doc
+  end
+
+  def valid_name_error(filename)
+    if !(1..20).cover?(filename.size)
+      @error = "File name must be between 1 and 20 characters"
+    elsif (filename =~ /(^[A-Za-z][A-Za-z0-9_]+)$/).nil?
+      @error = "Invalid file name.  File must begin with an alpha character.  The rest of the file name can only contain alphanumeric characters and underscores"
+    end
+    nil
   end
   
   def load(name, file_path)
@@ -80,7 +92,6 @@ class Document
     @raw_content = content
     File.write(document_path, @raw_content)
   end
-
 
   private
 
